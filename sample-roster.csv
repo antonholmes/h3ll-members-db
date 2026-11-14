@@ -1,7 +1,5 @@
-name,power,role,squad
-Alpha,152000000,Leader,Inferno
-Bravo,98500000,Officer,Inferno
-Charlie,87200000,Member,Ember
-Delta,120300000,Officer,Ember
-Echo,45000000,Member,Ash
-Foxtrot,66100000,Member,Ash
+#,R,Lvl,Username,Total Hero Power,Squad 1 Power,Squad 1 Type
+1,R4,33,Alpha,"145,928,181","48,610,000",Tank + 1 Adam
+2,R4,34,Bravo,"142,697,758","49,110,000",Missile
+3,R5,33,Charlie,"136,906,546","47,484,944",Air + 1 Marshall
+4,R3,32,Delta,"132,849,514","44,100,000",

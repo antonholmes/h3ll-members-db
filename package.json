@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "fetch": "node scripts/fetch-roster.mjs",
+    "fetch": "node --env-file-if-exists=.env scripts/fetch-roster.mjs",
     "dev": "vite",
-    "build": "node scripts/fetch-roster.mjs && tsc --noEmit && vite build",
+    "build": "node --env-file-if-exists=.env scripts/fetch-roster.mjs && tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

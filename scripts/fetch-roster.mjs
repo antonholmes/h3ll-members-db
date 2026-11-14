@@ -50,32 +50,60 @@ async function loadCsv() {
 }
 
 const { text, source } = await loadCsv();
-const rows = parseCsv(text.replace(/^﻿/, ""));
+const rows = parseCsv(text.replace(/^\uFEFF/, ""));
 if (rows.length < 2) throw new Error("CSV has no data rows");
 
 const header = rows[0].map((h) => h.trim().toLowerCase());
-const missing = required.filter((h) => !header.includes(h));
+const need = {
+  rank: "r",
+  level: "lvl",
+  name: "username",
+  power: "total hero power",
+  squadPower: "squad 1 power",
+  squadType: "squad 1 type",
+};
+const missing = Object.values(need).filter((h) => !header.includes(h));
 if (missing.length) throw new Error(`CSV missing columns: ${missing.join(", ")}. Found: ${header.join(", ")}`);
-const idx = Object.fromEntries(required.map((h) => [h, header.indexOf(h)]));
+const idx = Object.fromEntries(Object.entries(need).map(([k, h]) => [k, header.indexOf(h)]));
+
+const num = (v) => {
+  const s = (v ?? "").replace(/[,\s]/g, "");
+  if (s === "") return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+};
 
 const errors = [];
+const warnings = [];
 const seen = new Set();
 const members = [];
 rows.slice(1).forEach((r, i) => {
   const line = i + 2;
   const name = (r[idx.name] ?? "").trim();
-  const power = Number((r[idx.power] ?? "").replace(/[,\s]/g, ""));
-  const role = (r[idx.role] ?? "").trim();
-  const squad = (r[idx.squad] ?? "").trim();
-  if (!name) return errors.push(`line ${line}: empty name`);
-  if (!Number.isFinite(power)) return errors.push(`line ${line} (${name}): power is not a number`);
+  if (!name) return warnings.push(`line ${line}: no username, skipped`);
+  const power = num(r[idx.power]);
+  if (power === null || Number.isNaN(power)) return errors.push(`line ${line} (${name}): Total Hero Power is not a number`);
+  const squadPower = num(r[idx.squadPower]);
+  if (Number.isNaN(squadPower)) return errors.push(`line ${line} (${name}): Squad 1 Power is not a number`);
+  const level = num(r[idx.level]);
+  if (Number.isNaN(level)) return errors.push(`line ${line} (${name}): Lvl is not a number`);
   const key = name.toLowerCase();
-  if (seen.has(key)) return errors.push(`line ${line}: duplicate name "${name}"`);
+  if (seen.has(key)) warnings.push(`line ${line}: duplicate username "${name}" kept`);
   seen.add(key);
-  members.push({ name, power, role: role || "Member", squad: squad || "Unassigned" });
+  const squadType = (r[idx.squadType] ?? "").trim();
+  members.push({
+    name,
+    rank: (r[idx.rank] ?? "").trim().toUpperCase(),
+    level,
+    power,
+    squadPower,
+    squadType,
+    squadBase: squadType.split("+")[0].trim(),
+  });
 });
 
 if (errors.length) throw new Error(`Roster validation failed:\n  ${errors.join("\n  ")}`);
+warnings.forEach((w) => console.warn(`warning: ${w}`));
 
 await mkdir(dirname(out), { recursive: true });
 await writeFile(out, JSON.stringify({ updatedAt: new Date().toISOString(), source, members }, null, 2));
