@@ -12,7 +12,9 @@ Static roster site. Data lives in a Google Sheet (`name, power, role, squad`), i
 - `npm run dev`
 - `npm run build` (fetch, validate, type-check, bundle to `dist/`)
 
-## Deploy (Cloudflare Pages)
-- Build command `npm run build`, output directory `dist`, env vars `ROSTER_CSV_URL` and `NODE_VERSION=26`.
-- Create a deploy hook in Pages settings and save it as the GitHub secret `CF_PAGES_DEPLOY_HOOK`; `.github/workflows/rebuild.yml` triggers a rebuild every 30 minutes so sheet edits go live.
-- Gate access with Cloudflare Zero Trust > Access > Applications (free up to 50 users, email one-time PIN).
+## Deploy (Vercel)
+- Import the GitHub repo at vercel.com/new. Framework preset: Vite. Build command `npm run build`, output `dist`.
+- Environment variable `ROSTER_CSV_URL` = the published CSV link (mark Sensitive).
+- Settings > Git > Deploy Hooks: create one for `main`, save it as the GitHub secret `VERCEL_DEPLOY_HOOK`.
+- `.github/workflows/rebuild.yml` calls the hook every 30 minutes so sheet edits go live. Run it on demand from the Actions tab.
+- Never commit the CSV link or real exports.

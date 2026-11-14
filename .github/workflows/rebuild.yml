@@ -7,4 +7,4 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -fsS -X POST "${{ secrets.CF_PAGES_DEPLOY_HOOK }}"
+      - run: curl -fsS -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
