@@ -24,3 +24,9 @@ Static roster site. Data lives in a Google Sheet (`name, power, role, squad`), i
 - `api/login.ts` checks `ADMIN_USER`/`ADMIN_PASSWORD` and sets a signed HttpOnly cookie (7 days). `api/desert-storm.ts` fetches the sheet server-side, only for a valid cookie, so the data is not in the site files.
 - Locally, `npm run dev` serves the same `/api` handlers (see `vite.config.ts`). To try fake data, run with `DESERT_STORM_CSV_URL=` empty to use `sample-desert-storm.csv`.
 - Change the password: edit the variable in Vercel and redeploy.
+
+## History (Apps Script)
+- Paste `apps-script/Code.gs` into the sheet's Extensions > Apps Script. Project Settings > Script properties: add `SECRET` (same value as `APPS_SCRIPT_SECRET`). Deploy > New deployment > Web app: Execute as **Me**, access **Anyone**. Copy the `/exec` URL into `APPS_SCRIPT_URL`.
+- "Save to history" on the Desert Storm tab posts the selected date to `api/save-history.ts`, which forwards it (with the secret) to Apps Script. Apps Script creates/updates the `History` tab, replacing any earlier rows for that date.
+- Publish the `History` tab as CSV and set `HISTORY_CSV_URL`; the History tab reads it through `api/history.ts` (admin only).
+- Extra env vars: `APPS_SCRIPT_URL`, `APPS_SCRIPT_SECRET`, `HISTORY_CSV_URL`.

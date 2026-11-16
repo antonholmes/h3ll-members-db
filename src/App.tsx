@@ -6,12 +6,15 @@ import RosterTable from "./components/RosterTable";
 import SummaryStrip from "./components/SummaryStrip";
 import TypeBreakdown from "./components/TypeBreakdown";
 import AdminBox from "./components/AdminBox";
+import HistoryView from "./components/HistoryView";
 import DesertStorm from "./components/DesertStorm";
 
 const roster = data as RosterData;
 
 export default function App() {
-  const [tab, setTab] = useState<"roster" | "types" | "storm">("roster");
+  const [tab, setTab] = useState<"roster" | "types" | "storm" | "history">(
+    "roster",
+  );
   const [search, setSearch] = useState("");
   const [rank, setRank] = useState("");
   const [type, setType] = useState("");
@@ -59,7 +62,7 @@ export default function App() {
           Updated {new Date(roster.updatedAt).toLocaleString()}
         </span>
       </header>
-      {tab !== "storm" && (
+      {tab !== "storm" && tab !== "history" && (
         <SummaryStrip members={filtered}>
           <AdminBox
             admin={admin}
@@ -80,8 +83,16 @@ export default function App() {
             Desert Storm
           </button>
         )}
+        {admin && (
+          <button
+            className={tabCls("history")}
+            onClick={() => setTab("history")}
+          >
+            History
+          </button>
+        )}
       </nav>
-      {tab !== "storm" && (
+      {tab !== "storm" && tab !== "history" && (
         <Filters
           search={search}
           onSearch={setSearch}
@@ -96,6 +107,7 @@ export default function App() {
       {tab === "roster" && <RosterTable members={filtered} />}
       {tab === "types" && <TypeBreakdown members={filtered} />}
       {tab === "storm" && admin && <DesertStorm onUnauthorized={loggedOut} />}
+      {tab === "history" && admin && <HistoryView onUnauthorized={loggedOut} />}
     </div>
   );
 }

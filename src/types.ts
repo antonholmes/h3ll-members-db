@@ -24,6 +24,8 @@ export type StormMember = {
   rank: string;
   power: number;
   squadPower: number | null;
+  squadType: string;
+  squadBase: string;
   events: Record<string, Event>;
 };
 export type StormData = {
@@ -32,3 +34,18 @@ export type StormData = {
   dates: string[];
   members: StormMember[];
 };
+
+export type HistoryRow = {
+  savedAt: string;
+  date: string;
+  name: string;
+  rank: string;
+  power: number;
+  squadPower: number | null;
+  registered: string;
+  team: string;
+  enlisted: string;
+  attended: string;
+  assigned: string;
+};
+export type HistoryData = { dates: string[]; rows: HistoryRow[] };

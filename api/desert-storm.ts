@@ -1,45 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { num, parseCsv } from "./_lib/csv.js";
 import { isAdmin, json } from "./_lib/session.js";
-
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let cell = "";
-  let quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"' && text[i + 1] === '"') {
-        cell += '"';
-        i++;
-      } else if (c === '"') quoted = false;
-      else cell += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ",") {
-      row.push(cell);
-      cell = "";
-    } else if (c === "\n" || c === "\r") {
-      if (c === "\r" && text[i + 1] === "\n") i++;
-      row.push(cell);
-      rows.push(row);
-      row = [];
-      cell = "";
-    } else cell += c;
-  }
-  if (cell !== "" || row.length) {
-    row.push(cell);
-    rows.push(row);
-  }
-  return rows.filter((r) => r.some((v) => v.trim() !== ""));
-}
-
-const num = (v: string | undefined): number | null => {
-  const s = (v ?? "").replace(/[,\s]/g, "");
-  if (s === "") return null;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : NaN;
-};
 
 const FIELDS: Record<string, string[]> = {
   registered: ["yes", "no"],
@@ -94,6 +56,7 @@ export async function GET(request: Request): Promise<Response> {
     const idx = Object.fromEntries(
       Object.entries(need).map(([k, h]) => [k, header.indexOf(h)]),
     );
+    const typeIdx = header.indexOf("squad 1 type");
 
     const cols: { date: string; field: string; i: number }[] = [];
     header.forEach((h, i) => {
@@ -148,11 +111,14 @@ export async function GET(request: Request): Promise<Response> {
         }
         events[date][field] = cap(v.toLowerCase());
       }
+      const squadType = typeIdx >= 0 ? (r[typeIdx] ?? "").trim() : "";
       members.push({
         name,
         rank: (r[idx.rank] ?? "").trim().toUpperCase(),
         power,
         squadPower,
+        squadType,
+        squadBase: squadType.split("+")[0].trim(),
         events,
       });
     }
