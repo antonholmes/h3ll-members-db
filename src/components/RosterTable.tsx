@@ -15,7 +15,10 @@ const columns: { key: Key; label: string; numeric?: boolean }[] = [
 const dash = "—";
 
 export default function RosterTable({ members }: { members: Member[] }) {
-  const [sort, setSort] = useState<{ key: Key; desc: boolean }>({ key: "power", desc: true });
+  const [sort, setSort] = useState<{ key: Key; desc: boolean }>({
+    key: "power",
+    desc: true,
+  });
 
   const rows = useMemo(() => {
     const dir = sort.desc ? -1 : 1;
@@ -24,13 +27,18 @@ export default function RosterTable({ members }: { members: Member[] }) {
       const y = b[sort.key];
       if (x === null || x === "") return y === null || y === "" ? 0 : 1;
       if (y === null || y === "") return -1;
-      const cmp = typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y));
+      const cmp =
+        typeof x === "number" && typeof y === "number"
+          ? x - y
+          : String(x).localeCompare(String(y));
       return cmp * dir;
     });
   }, [members, sort]);
 
   const toggle = (key: Key, numeric?: boolean) =>
-    setSort((s) => (s.key === key ? { key, desc: !s.desc } : { key, desc: !!numeric }));
+    setSort((s) =>
+      s.key === key ? { key, desc: !s.desc } : { key, desc: !!numeric },
+    );
 
   const cell = (m: Member, key: Key) => {
     switch (key) {
@@ -69,10 +77,18 @@ export default function RosterTable({ members }: { members: Member[] }) {
         </thead>
         <tbody>
           {rows.map((m, i) => (
-            <tr key={`${m.name}-${i}`} className="border-t border-zinc-800 hover:bg-zinc-900/60">
-              <td className="px-3 py-1.5 tabular-nums text-zinc-500">{i + 1}</td>
+            <tr
+              key={`${m.name}-${i}`}
+              className="border-t border-zinc-800 hover:bg-zinc-900/60"
+            >
+              <td className="px-3 py-1.5 tabular-nums text-zinc-500">
+                {i + 1}
+              </td>
               {columns.map((c) => (
-                <td key={c.key} className={`px-3 py-1.5 tabular-nums ${c.numeric ? "text-right" : ""}`}>
+                <td
+                  key={c.key}
+                  className={`px-3 py-1.5 tabular-nums ${c.numeric ? "text-right" : ""}`}
+                >
                   {cell(m, c.key)}
                 </td>
               ))}
@@ -80,7 +96,10 @@ export default function RosterTable({ members }: { members: Member[] }) {
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length + 1} className="px-3 py-6 text-center text-zinc-500">
+              <td
+                colSpan={columns.length + 1}
+                className="px-3 py-6 text-center text-zinc-500"
+              >
                 No members match.
               </td>
             </tr>

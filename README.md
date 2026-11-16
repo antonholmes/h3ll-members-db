@@ -14,7 +14,13 @@ Static roster site. Data lives in a Google Sheet (`name, power, role, squad`), i
 
 ## Deploy (Vercel)
 - Import the GitHub repo at vercel.com/new. Framework preset: Vite. Build command `npm run build`, output `dist`.
-- Environment variable `ROSTER_CSV_URL` = the published CSV link (mark Sensitive).
+- Environment variables (mark all Sensitive): `ROSTER_CSV_URL`, `DESERT_STORM_CSV_URL` (published CSV links), `ADMIN_USER`, `ADMIN_PASSWORD` (a long passphrase), `SESSION_SECRET` (`openssl rand -hex 32`).
 - Settings > Git > Deploy Hooks: create one for `main`, save it as the GitHub secret `VERCEL_DEPLOY_HOOK`.
 - `.github/workflows/rebuild.yml` calls the hook every 30 minutes so sheet edits go live. Run it on demand from the Actions tab.
 - Never commit the CSV link or real exports.
+
+## Admin login
+- Desert Storm is admin-only. The "Admin login" link sits under the Ranks card; once signed in, a Desert Storm tab appears.
+- `api/login.ts` checks `ADMIN_USER`/`ADMIN_PASSWORD` and sets a signed HttpOnly cookie (7 days). `api/desert-storm.ts` fetches the sheet server-side, only for a valid cookie, so the data is not in the site files.
+- Locally, `npm run dev` serves the same `/api` handlers (see `vite.config.ts`). To try fake data, run with `DESERT_STORM_CSV_URL=` empty to use `sample-desert-storm.csv`.
+- Change the password: edit the variable in Vercel and redeploy.

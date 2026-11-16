@@ -7,4 +7,28 @@ export type Member = {
   squadType: string;
   squadBase: string;
 };
-export type RosterData = { updatedAt: string; source: string; members: Member[] };
+export type RosterData = {
+  updatedAt: string;
+  source: string;
+  members: Member[];
+};
+
+export type Event = {
+  registered: string;
+  team: string;
+  enlisted: string;
+  attended: string;
+};
+export type StormMember = {
+  name: string;
+  rank: string;
+  power: number;
+  squadPower: number | null;
+  events: Record<string, Event>;
+};
+export type StormData = {
+  updatedAt: string;
+  source: string;
+  dates: string[];
+  members: StormMember[];
+};
